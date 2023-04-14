@@ -1,0 +1,153 @@
+Sub project2()
+'--------------------------------------------------
+'Below defines all variables
+    Dim ticker As String
+    Dim yearlychange As Double
+    Dim percentchange As Double
+    Dim totalvolume As Double
+    Dim sumtablerow As Integer
+    Dim opennum As Double
+    Dim closenum As Double
+    Dim tickerdate As Double
+    Dim lastrow As Double
+    Dim max As Double
+    Dim min As Double
+    Dim maxvalue As Double
+    
+    
+'Below pushes the code to each worksheet
+    For Each ws In Worksheets
+        
+        Dim Worksheetname As String
+        
+        lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        
+        Worksheetname = ws.Name
+
+'--------------------------------------------
+'Below creates the summary table headings
+        ws.Cells(1, 9).Value = "3 Letter Ticker"
+        ws.Cells(1, 10).Value = "Yearly Change"
+        ws.Cells(1, 11).Value = "Percent Change"
+        ws.Cells(1, 12).Value = "Stock Volume"
+        ws.Cells(2, 14).Value = "Greatest % Increase"
+        ws.Cells(3, 14).Value = "Greatest % Decrease"
+        ws.Cells(4, 14).Value = "Greatest Total Volume"
+        ws.Cells(1, 15).Value = "Ticker"
+        ws.Cells(1, 16).Value = "Total Value"
+'-----------------------------------------------
+
+'Below sets the variables we are finding after each iteration to zero
+    totalvolume = 0
+    opennum = 0
+    closenum = 0
+    sumtablerow = 2
+    max = 0
+    maxvalue = 0
+    
+    'Format Row K to be a 0.00%
+    Range("K1:K753001").NumberFormat = "0.00%"
+    Cells(2, 16).NumberFormat = "0.00%"
+    Cells(3, 16).NumberFormat = "0.00%"
+      
+    'Loop to find the Ticker and yearly total volume
+                
+        
+        For i = 2 To 753001
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+                ticker = ws.Cells(i, 1).Value
+                totalvolume = totalvolume + ws.Cells(i, 7).Value
+                ws.Range("I" & sumtablerow).Value = ticker
+                ws.Range("L" & sumtablerow).Value = totalvolume
+                sumtablerow = sumtablerow + 1
+                totalvolume = 0
+            Else
+                totalvolume = totalvolume + ws.Cells(i, 7).Value
+            End If
+        Next i
+        
+     For i = 2 To lastrow
+        If ws.Cells(i, 2) = "20200102" Then
+            opennum = ws.Cells(i, 3)
+        ElseIf ws.Cells(i, 2) = "20201231" Then
+            closenum = ws.Cells(i, 6)
+            ws.Range("J" & sumtablerow) = closenum - opennum
+            ws.Range("K" & sumtablerow) = (closenum - opennum) / opennum
+            sumtablerow = sumtablerow + 1
+            opennum = 0
+            closenum = 0
+        End If
+    Next i
+    
+    For i = 2 To lastrow
+        If ws.Cells(i, 2) = "20190102" Then
+            opennum = ws.Cells(i, 3)
+        ElseIf ws.Cells(i, 2) = "20191231" Then
+            closenum = ws.Cells(i, 6)
+            ws.Range("J" & sumtablerow) = closenum - opennum
+            ws.Range("K" & sumtablerow) = (closenum - opennum) / opennum
+            sumtablerow = sumtablerow + 1
+            opennum = 0
+            closenum = 0
+        End If
+    Next i
+    
+     For i = 2 To lastrow
+        If ws.Cells(i, 2) = "20180102" Then
+            opennum = ws.Cells(i, 3)
+        ElseIf ws.Cells(i, 2) = "20181231" Then
+            closenum = ws.Cells(i, 6)
+            ws.Range("J" & sumtablerow) = closenum - opennum
+            ws.Range("K" & sumtablerow) = (closenum - opennum) / opennum
+            sumtablerow = sumtablerow + 1
+            opennum = 0
+            closenum = 0
+        End If
+    Next i
+    
+    'Change the colors of Row J
+       For i = 2 To lastrow
+            If ws.Cells(i, 10).Value < 0 Then
+                ws.Cells(i, 10).Interior.ColorIndex = 3
+            ElseIf ws.Cells(i, 10).Value > 0 Then
+            ws.Cells(i, 10).Interior.ColorIndex = 4
+            End If
+        Next i
+        
+        For i = 2 To lastrow
+            If ws.Cells(i, 11) > max Then
+                max = ws.Cells(i, 11).Value
+                ws.Cells(2, 15).Value = ws.Cells(i, 1).Value
+            ElseIf ws.Cells(i, 11).Value < max Then
+                max = max
+            End If
+        Next i
+                
+            ws.Cells(2, 16).Value = max
+            max = 0
+
+        For i = 2 To lastrow
+            If ws.Cells(i, 11) < min Then
+                min = ws.Cells(i, 11).Value
+                ws.Cells(3, 15).Value = ws.Cells(i, 1).Value
+            ElseIf ws.Cells(i, 11).Value > min Then
+                min = min
+            End If
+        Next i
+        
+        ws.Cells(3, 16).Value = min
+        min = 0
+            
+         For i = 2 To lastrow
+            If ws.Cells(i, 12) > maxvalue Then
+                maxvalue = ws.Cells(i, 12).Value
+                ws.Cells(4, 15).Value = ws.Cells(i, 1).Value
+            ElseIf ws.Cells(i, 12).Value < maxvalue Then
+                maxvalue = maxvalue
+            End If
+        Next i
+         ws.Cells(4, 16).Value = maxvalue
+         maxvalue = 0
+Next ws
+End Sub
+
